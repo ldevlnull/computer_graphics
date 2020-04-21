@@ -8,8 +8,8 @@ void setup() {
   translate(hw, hh);
   drawAxes();
   //line(-3*scale, 4*scale, 2*scale, -6*scale);
-  //lineBrez(-3*scale, 4*scale, 2*scale, -6*scale);
-  drawShape();
+  lineBrez(-3*scale, 4*scale, 2*scale, -6*scale);
+  //drawShape();
 }
 
 void drawAxes() {
@@ -76,16 +76,18 @@ void lineBrez(int x1, int y1, int x2, int y2) {
   line (x, y, x, y);
   
   for (int t = 0; t < el; t++) {
-  err -= es;
-  if (err < 0) {
-    err += el;
-    x += incx;
-    y += incy;
-  } else {
-    x += pdx;
-    y += pdy;
-  }
-  line (x, y, x, y);
+    err -= es;
+    if (err < 0) {
+      err += el;
+      x += incx;
+      y += incy;
+    } else {
+      x += pdx;
+      y += pdy;
+    }
+    line (x, y, x, y);
+    if (t%scale == 0)
+       print(String.format("x = %d\ty = %d%n", x/scale, y/scale));
   }
 }
 
