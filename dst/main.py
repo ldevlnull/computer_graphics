@@ -2,7 +2,7 @@ import cv2
 import math
 from dst.zigzag import *
 
-IMAGE_PATH = 'sample_420x420.bmp'
+IMAGE_PATH = 'sample.bmp'
 BLOCK_SIZE = 8
 QUANTIZATION_MATRIX = np.array([
     [16, 11, 10, 16, 24,  40,  51,   61],
@@ -21,18 +21,16 @@ def main():
     cv2.imwrite('y_layer.bmp', np.uint8(padded_img))
     encode(horizontal_blocks, padded_img, vertical_blocks)
     cv2.imshow('Закодоване зображення', np.uint8(padded_img))
-    arranged = padded_img.flatten()
-    bitstream = get_run_length_encoding(arranged)
-    bitstream = str(padded_img.shape[0]) + " " + str(padded_img.shape[1]) + " " + bitstream + ";"
-    file1 = open("encoded_image.txt", "w")
-    file1.write(bitstream)
-    file1.close()
+    print_img_to_file(padded_img)
+    print("Готово!")
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
 
+# Стовюємо зображення для алгоритму. Переводимо вхідне зображення до системи Y'CrCb і дістаємо перший канал (шар Y).
 def create_padded_image():
-    img = cv2.imread(IMAGE_PATH, cv2.IMREAD_GRAYSCALE)
+    img = cv2.imread(IMAGE_PATH, cv2.IMREAD_COLOR)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2YCrCb)[:, :, 0]
     [h, w] = img.shape
     height = h
     width = w
@@ -69,6 +67,17 @@ def encode(horizontal_blocks, padded_img, vertical_blocks):
             padded_img[left_row_i: right_row_i, top_col_j: bot_col_j] = block_reshaped
 
 
+# Запис у текстовий файл зображенян у вигляді бітів (коефіцієнтів ДКП)
+def print_img_to_file(padded_img):
+    arranged = padded_img.flatten()
+    bit_stream = get_run_length_encoding(arranged)
+    bit_stream = str(padded_img.shape[0]) + " " + str(padded_img.shape[1]) + " " + bit_stream + ";"
+    file1 = open("encoded_image.txt", "w")
+    file1.write(bit_stream)
+    file1.close()
+
+
+# Серилізування зображення в поток бітів для запису у файл
 def get_run_length_encoding(img):
     i = skipped = 0
     stream = []
