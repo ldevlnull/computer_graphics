@@ -1,24 +1,12 @@
 import cv2
 import math
 from dst.zigzag import *
-
-IMAGE_PATH = 'sample.bmp'
-BLOCK_SIZE = 8
-QUANTIZATION_MATRIX = np.array([
-    [16, 11, 10, 16, 24,  40,  51,   61],
-    [12, 12, 14, 19, 26,  58,  60,   55],
-    [14, 13, 16, 24, 40,  57,  69,   56],
-    [14, 17, 22, 29, 51,  87,  80,   62],
-    [18, 22, 37, 56, 68,  109, 103,  77],
-    [24, 35, 55, 64, 81,  104, 113,  92],
-    [49, 64, 78, 87, 103, 121, 120, 101],
-    [72, 92, 95, 98, 112, 100, 103,  99]
-])
+from dst.consts import *
 
 
 def main():
     horizontal_blocks, padded_img, vertical_blocks = create_padded_image()
-    cv2.imwrite('y_layer.bmp', np.uint8(padded_img))
+    cv2.imwrite(Y_LAYER_IMAGE, np.uint8(padded_img))
     encode(horizontal_blocks, padded_img, vertical_blocks)
     cv2.imshow('Закодоване зображення', np.uint8(padded_img))
     print_img_to_file(padded_img)
@@ -29,7 +17,7 @@ def main():
 
 # Стовюємо зображення для алгоритму. Переводимо вхідне зображення до системи Y'CrCb і дістаємо перший канал (шар Y).
 def create_padded_image():
-    img = cv2.imread(IMAGE_PATH, cv2.IMREAD_COLOR)
+    img = cv2.imread(INPUT_IMAGE_PATH, cv2.IMREAD_COLOR)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2YCrCb)[:, :, 0]
     [h, w] = img.shape
     height = h
@@ -72,7 +60,7 @@ def print_img_to_file(padded_img):
     arranged = padded_img.flatten()
     bit_stream = get_run_length_encoding(arranged)
     bit_stream = str(padded_img.shape[0]) + " " + str(padded_img.shape[1]) + " " + bit_stream + ";"
-    file1 = open("encoded_image.txt", "w")
+    file1 = open(FILE_PATH, "w")
     file1.write(bit_stream)
     file1.close()
 
